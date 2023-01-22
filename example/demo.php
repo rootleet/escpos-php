@@ -1,4 +1,6 @@
 <?php
+error_reporting( E_ALL );
+ini_set( "display_errors", 1 );
 /**
  * This is a demo script for the functions of the PHP ESC/POS print driver,
  * Escpos.php.
@@ -9,11 +11,13 @@
  * @author Michael Billington <michael.billington@gmail.com>
  */
 require __DIR__ . '/../vendor/autoload.php';
+
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\EscposImage;
 
-$connector = new FilePrintConnector("php://stdout");
+$connector = new WindowsPrintConnector("POS");
 $printer = new Printer($connector);
 
 /* Initialize */

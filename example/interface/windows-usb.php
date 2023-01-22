@@ -1,4 +1,6 @@
 <?php
+error_reporting( E_ALL );
+ini_set( "display_errors", 1 );
 /* Change to the correct path if you copy this example! */
 require __DIR__ . '/../../vendor/autoload.php';
 use Mike42\Escpos\Printer;
@@ -20,7 +22,7 @@ use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 try {
     // Enter the share name for your USB printer here
     $connector = null;
-    //$connector = new WindowsPrintConnector("Receipt Printer");
+    $connector = new WindowsPrintConnector("POS");
 
     /* Print a "Hello world" receipt" */
     $printer = new Printer($connector);

@@ -1,11 +1,16 @@
 <?php
+error_reporting( E_ALL );
+ini_set( "display_errors", 1 );
 require __DIR__ . '/../vendor/autoload.php';
+
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 
 /* Fill in your own connector here */
-$connector = new FilePrintConnector("php://stdout");
+$connector = new WindowsPrintConnector("POS");
+
 
 /* Information for the receipt */
 $items = array(
@@ -15,11 +20,24 @@ $items = array(
     new item("A final item", "4.45"),
 );
 $subtotal = new item('Subtotal', '12.95');
+
+$taxable = new item('Taxable Amount', '12.95');
+$tax = new item('Tax Amount', '12.95');
+$billAmt = new item('Bill Amount', '12.95');
+$paidAmt = new item('Paid Amount', '12.95');
+$balAmt = new item('Bal. Amount', '12.95');
+
+
+
 $tax = new item('A local tax', '1.30');
-$total = new item('Total', '14.25', true);
+$nhil = new item('NHIL (2.5%)', '1.30');
+$getf = new item('GETL (2.5%)', '1.30');
+$covid = new item('COVID (1%)', '1.30');
+$total = new item('TAXABLE AMT', '1.30');
+$vat = new item('VAT (21.9%)', '1.30');
 /* Date is kept the same for testing */
-// $date = date('l jS \of F Y h:i:s A');
-$date = "Monday 6th of April 2015 02:56:25 PM";
+ $date = date('l jS \of F Y h:i:s A');
+//$date = "Monday 6th of April 2015 02:56:25 PM";
 
 /* Start the printer */
 $logo = EscposImage::load("resources/escpos-php.png", false);
@@ -33,13 +51,20 @@ $printer -> graphics($logo);
 $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 $printer -> text("ExampleMart Ltd.\n");
 $printer -> selectPrintMode();
-$printer -> text("Shop No. 42.\n");
-$printer -> feed();
-
 /* Title of receipt */
 $printer -> setEmphasis(true);
-$printer -> text("SALES INVOICE\n");
+$printer -> text("TAX INVOICE\n");
 $printer -> setEmphasis(false);
+
+$printer->setJustification(Printer::JUSTIFY_LEFT);
+$printer -> text("Bill# 77");
+$printer->feed();
+$printer -> text("M# 77");
+$printer ->feed();
+$printer -> text("Admin");
+$printer -> feed();
+
+
 
 /* Items */
 $printer -> setJustification(Printer::JUSTIFY_LEFT);
@@ -49,16 +74,34 @@ $printer -> setEmphasis(false);
 foreach ($items as $item) {
     $printer -> text($item);
 }
-$printer -> setEmphasis(true);
-$printer -> text($subtotal);
-$printer -> setEmphasis(false);
+//$printer -> setEmphasis(true);
+//$printer -> text($subtotal);
+//$printer -> setEmphasis(false);
 $printer -> feed();
 
 /* Tax and total */
+$printer -> text($taxable);
 $printer -> text($tax);
+$printer -> text($billAmt);
+$printer -> text($paidAmt);
+$printer -> text($balAmt);
+$printer -> feed();
+
 $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-$printer -> text($total);
+$printer -> text("TAX BREAKDOWN\n");
 $printer -> selectPrintMode();
+
+$printer -> text($nhil);
+$printer -> text($getf);
+$printer -> text($covid);
+$printer -> feed();
+$printer->setUnderline(1);
+//$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+//$printer -> setEmphasis(true);
+//$printer -> text($total);
+//$printer -> text($vat);
+//$printer -> setEmphasis(false);
+//$printer -> selectPrintMode();
 
 /* Footer */
 $printer -> feed(2);
